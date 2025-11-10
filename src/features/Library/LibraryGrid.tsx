@@ -1,6 +1,7 @@
 // src/features/Library/LibraryGrid.tsx
 
 import React from 'react';
+import Image from 'next/image'; // Import the Image component
 import { BookData } from '@/data/types';
 import BookCover from './BookCover';
 import styles from './LibraryGrid.module.css';
@@ -13,6 +14,15 @@ const LibraryGrid: React.FC<LibraryGridProps> = ({ books }) => {
   return (
     <div className={styles.pageContainer}>
       <header className={styles.header}>
+        <div className={styles.logoContainer}>
+          <Image
+            src="/gia-t-books/madoodle-logo.svg"
+            alt="Madoodle Logo"
+            width={250}
+            height={60}
+            priority
+          />
+        </div>
         <h1 className={styles.title}>Gia's Books</h1>
         <p className={styles.subtitle}>Select a story to begin</p>
       </header>

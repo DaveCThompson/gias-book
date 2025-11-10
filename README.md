@@ -1,8 +1,8 @@
 // GIA-CODE/gia-t-books/README.md
 
-# Interactive Storybook: "Slimey" POC
+# Madoodle: An Interactive Storybook Platform
 
-This project is a high-craft proof-of-concept for a mobile-first, interactive children's storybook platform. The initial release features the book **"Slimey,"** written by **Gia**. It is built on a robust foundation of modern web technologies to create a delightful, engaging, and scalable reading experience.
+This project is a high-craft proof-of-concept for **Madoodle**, a mobile-first, interactive children's storybook platform. The initial release features the book **"Slimey,"** written by **Gia**. It is built on a robust foundation of modern web technologies to create a delightful, engaging, and scalable reading experience.
 
 ---
 
@@ -16,50 +16,39 @@ This project is a high-craft proof-of-concept for a mobile-first, interactive ch
 
 ## 2. Technology Stack
 
--   **Framework:** Next.js
+-   **Framework:** Next.js (with Static Site Generation)
 -   **Language:** TypeScript
--   **Styling:** CSS Modules for component-scoped styles, with a global stylesheet for base styles and fonts.
+-   **Styling:** CSS Modules
 -   **State Management:** Zustand
--   **Animation:** Framer Motion
--   **UI Primitives:** Radix UI
--   **Page Swiping:** Swiper.js
--   **Audio Management:** Howler.js
--   **Content Parser:** html-react-parser
+-   **Deployment:** GitHub Pages (via `gh-pages` package)
 
-## 3. Proof-of-Concept Features
+## 3. Directory Structure
 
--   **Swipe Navigation:** A smooth, horizontal swipe gesture for navigating between pages of the book.
--   **Dual Reading Modes:** A user-selectable choice between an automated "Read to Me" mode with narration and an "I'll Read" mode for self-paced reading.
--   **Interactive Vocabulary:** Tappable words that reveal definitions in a tooltip.
--   **Expressive Typography:** Dynamic use of fonts and styles to make the text an integral part of the storytelling.
--   **Artistic Visuals:**
-    -   **Image Masking:** Illustrations are presented within artistic, non-rectangular frames.
-    -   **Dynamic Text Flow:** Text intelligently wraps around the contours of transparent images.
-
-## 4. Directory Structure
-
+-   **/public**: Contains all static assets (images, fonts, audio files) that are served directly to the browser.
 -   **/src**: Contains all application source code.
--   **/src/books**: Contains self-contained book content modules, each with its own `data.json` and co-located `assets`.
--   **/src/features**: Contains major, user-facing areas of the application, organized into "vertical slices" of functionality (e.g., `/BookReader`, `/Library`).
--   **/src/components**: Contains only **truly generic and reusable** UI primitives that are application-agnostic.
+-   **/src/books**: Contains self-contained book content modules, each with its own `data.json`.
+-   **/src/features**: Contains major, user-facing areas of the application, organized into "vertical slices" (e.g., `/BookReader`, `/Library`).
 -   **/src/data**: A single, consolidated directory for all non-visual logic, including the Zustand store, custom hooks, type definitions, and application-wide constants.
 -   **/src/styles**: Contains the global styling architecture, including `globals.css` for resets and `fonts.css`.
 
-## 5. Styling Architecture
+## 4. Deployment to GitHub Pages
 
-The project uses **CSS Modules** for a robust, component-scoped styling strategy.
+This project uses a manual deployment process that gives you full control over when updates go live.
 
--   **Local by Default:** Every component is paired with its own `[ComponentName].module.css` file. All class names are locally scoped by default, preventing style collisions.
--   **Global Styles:** A single `src/styles/globals.css` file is used for CSS resets, font definitions, and root-level CSS Custom Properties (variables). It is the only global stylesheet.
--   **Composition:** Where needed, class names are composed using utility libraries or template literals to apply multiple styles conditionally.
+1.  **Commit & Push:** Make your code changes and commit them to the `main` branch using your preferred Git client (e.g., VS Code's Source Control panel). This saves your work but does **not** make it live.
+2.  **Deploy:** When you are ready to publish, run the following command in the terminal:
+    ```bash
+    npm run deploy
+    ```
+This command automatically builds the project and pushes the final static files to the `gh-pages` branch, which updates the live site.
 
-## 6. State Management
+## 5. Asset Inventory
 
-The project uses **Zustand** for its minimal and powerful state management model.
+This section provides specifications for the key visual assets required for the project.
 
--   **Centralized Store:** Global UI state (e.g., the current reading mode) is managed in a central store located in `src/data/settings.ts`.
--   **Persistence:** The store uses Zustand's `persist` middleware to automatically save and rehydrate user settings from `localStorage`, ensuring a consistent experience between sessions.
-
-## 7. Developer Notes
-
--   **File Naming Convention:** When providing files to the AI agent, TypeScript files (`.ts`, `.tsx`) may be uploaded with a `.txt` extension. The filenames are correct on the local file system.
+| Asset                 | Description                                                               | Target Format | Aspect Ratio | Target Size (px) |
+| --------------------- | ------------------------------------------------------------------------- | ------------- | ------------ | ---------------- |
+| **Madoodle Logo**     | The main brand logo, displayed on the library page.                       | SVG           | N/A          | `250 x 60`       |
+| **Book Cover Image**  | A unique, compelling cover for each book. Displayed in the `LibraryGrid`. | JPG / WebP    | `3:4`        | `600 x 800`      |
+| **Page Illustration** | Full-page illustrations that accompany the story text.                    | JPG / WebP    | `4:3`        | `1600 x 1200`    |
+| **Illustration Mask** | An artistic shape (e.g., watercolor splotch) used to frame illustrations. | SVG           | `1:1`        | `1000 x 1000`    |

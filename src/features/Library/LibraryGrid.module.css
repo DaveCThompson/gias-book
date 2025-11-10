@@ -11,6 +11,11 @@
   margin-bottom: 3rem;
 }
 
+/* New styles for the logo */
+.logoContainer {
+  margin-bottom: 1rem;
+}
+
 .title {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 4rem);
