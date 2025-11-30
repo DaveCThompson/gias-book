@@ -1,4 +1,4 @@
-/* src/features/BookReader/Navigation.module.css */
+/* src/features/BookReader/components/Navigation.module.css */
 
 .navContainer {
   position: fixed;
@@ -14,6 +14,30 @@
   backdrop-filter: blur(5px);
   border-bottom: 1px solid var(--color-button-border);
   font-family: var(--font-body);
+}
+
+.leftControls,
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.rightControls {
+  justify-content: flex-end;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.logoLink:hover {
+  opacity: 1;
 }
 
 .navButton {
@@ -43,9 +67,13 @@
   gap: 12px;
   font-size: 1rem;
   color: var(--color-text);
+  justify-content: center;
+  flex: 1;
+  text-align: center;
 }
 
-.playButton {
+.playButton,
+.settingsButton {
   background: none;
   border: 1px solid var(--color-button-border);
   border-radius: 50%;
@@ -57,12 +85,14 @@
   font-size: 1.2rem;
   color: var(--color-text);
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
-.playButton:hover:not(:disabled) {
+.playButton:hover:not(:disabled),
+.settingsButton:hover {
   background-color: var(--color-button-background-hover);
   border-color: var(--color-interactive);
+  color: var(--color-interactive);
 }
 
 .playButton:disabled {

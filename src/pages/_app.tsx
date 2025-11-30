@@ -2,10 +2,14 @@
 
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
+import { useThemeManager } from '@/data/hooks/useThemeManager';
 
-// Import Swiper's core styles globally as it's a key part of the app's navigation
+// Import Swiper's core styles globally
 import 'swiper/css';
 
 export default function App({ Component, pageProps }: AppProps) {
+  // This hook manages the theme for the entire application
+  useThemeManager();
+
   return <Component {...pageProps} />;
 }

@@ -4,10 +4,13 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 type ReadingMode = 'narrated' | 'selfRead';
+export type ThemePreference = 'system' | 'light' | 'dark';
 
 interface SettingsState {
   readingMode: ReadingMode;
   toggleReadingMode: () => void;
+  theme: ThemePreference;
+  setTheme: (theme: ThemePreference) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -19,6 +22,8 @@ export const useSettingsStore = create<SettingsState>()(
           readingMode:
             state.readingMode === 'narrated' ? 'selfRead' : 'narrated',
         })),
+      theme: 'system',
+      setTheme: (newTheme) => set({ theme: newTheme }),
     }),
     {
       name: 'gia-t-books-settings',

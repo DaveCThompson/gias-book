@@ -5,10 +5,10 @@
 export interface PageData {
   pageNumber: number;
   text: string;
-  // FIX: Make illustration and mask optional properties to match the data
   illustration?: string;
   mask?: string;
   narrationUrl?: string;
+  mood?: 'calm' | 'tense' | 'joyful'; // Added optional mood property
 }
 
 export interface BookData {

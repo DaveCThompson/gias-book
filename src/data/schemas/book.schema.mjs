@@ -9,6 +9,7 @@ const pageDataSchema = z.object({
   illustration: z.string().url().optional(),
   mask: z.string().optional(),
   narrationUrl: z.string().optional(),
+  mood: z.enum(['calm', 'tense', 'joyful']).optional(), // Added mood validation
 });
 
 // Schema for the entire book data file

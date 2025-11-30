@@ -10,13 +10,13 @@ import { useProgressStore } from '@/data/stores/progress.store';
 import { useAudioPlayer } from '@/data/useAudioPlayer';
 import { BookData, PageData } from '@/data/types';
 import Page from './Page';
-import NarrationControls from './NarrationControls';
-import Navigation from './Navigation';
+import NarrationControls from './components/NarrationControls';
+import Navigation from './components/Navigation';
 import styles from './BookReader.module.css';
 
 interface BookReaderProps {
   bookData: BookData;
-  currentPage: number; // The page number from the URL
+  currentPage: number;
 }
 
 const BookReader: React.FC<BookReaderProps> = ({ bookData, currentPage }) => {
@@ -24,20 +24,15 @@ const BookReader: React.FC<BookReaderProps> = ({ bookData, currentPage }) => {
   const { readingMode } = useSettingsStore();
   const { getLastReadPage, setLastReadPage } = useProgressStore();
   const { play, stop, isPlaying } = useAudioPlayer();
-  const [swiperInstance, setSwiperInstance] = useState<SwiperInstance | null>(
-    null
-  );
-  const [activePage, setActivePage] = useState<PageData>(
-    bookData.pages[currentPage - 1]
-  );
+  const [swiperInstance, setSwiperInstance] = useState<SwiperInstance | null>(null);
+  const [activePage, setActivePage] = useState<PageData>(bookData.pages[currentPage - 1]);
   const hasInitializedFromStorage = useRef(false);
 
-  // Effect to initialize Swiper to the last-read page from storage
   useEffect(() => {
     if (swiperInstance && !hasInitializedFromStorage.current) {
       const lastReadPage = getLastReadPage(bookData.slug);
       if (lastReadPage && lastReadPage !== currentPage) {
-        swiperInstance.slideTo(lastReadPage - 1, 0); // 0ms transition for init
+        swiperInstance.slideTo(lastReadPage - 1, 0);
       }
       hasInitializedFromStorage.current = true;
     }
@@ -48,12 +43,10 @@ const BookReader: React.FC<BookReaderProps> = ({ bookData, currentPage }) => {
     const newActivePage = bookData.pages[swiper.activeIndex];
     setActivePage(newActivePage);
     setLastReadPage(bookData.slug, newPageNumber);
-
     const url = `/${bookData.slug}/${newPageNumber}`;
     router.replace(url, undefined, { shallow: true });
   };
 
-  // Auto-play logic for "narrated" mode
   useEffect(() => {
     if (readingMode === 'narrated' && activePage?.narrationUrl) {
       play(activePage.narrationUrl);
@@ -62,12 +55,8 @@ const BookReader: React.FC<BookReaderProps> = ({ bookData, currentPage }) => {
     }
   }, [readingMode, activePage, play, stop]);
 
-  const handlePrev = useCallback(() => swiperInstance?.slidePrev(), [
-    swiperInstance,
-  ]);
-  const handleNext = useCallback(() => swiperInstance?.slideNext(), [
-    swiperInstance,
-  ]);
+  const handlePrev = useCallback(() => swiperInstance?.slidePrev(), [swiperInstance]);
+  const handleNext = useCallback(() => swiperInstance?.slideNext(), [swiperInstance]);
 
   const handlePlayPause = useCallback(() => {
     if (isPlaying) {
@@ -78,7 +67,7 @@ const BookReader: React.FC<BookReaderProps> = ({ bookData, currentPage }) => {
   }, [isPlaying, activePage, play, stop]);
 
   return (
-    <div className={styles.bookReaderContainer}>
+    <div className={styles.bookReaderContainer} data-mood={activePage.mood || 'calm'}>
       <Navigation
         currentPage={activePage.pageNumber}
         totalPages={bookData.pages.length}
