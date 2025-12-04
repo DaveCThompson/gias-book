@@ -22,14 +22,9 @@ This project is a high-craft proof-of-concept for **Madoodle**, a mobile-first, 
 -   **State Management:** Zustand
 -   **Deployment:** GitHub Pages (via `gh-pages` package)
 
-## 3. Directory Structure
+## 3. Developer Guide
 
--   **/public**: Contains all static assets (images, fonts, audio files) that are served directly to the browser.
--   **/src**: Contains all application source code.
--   **/src/books**: Contains self-contained book content modules, each with its own `data.json`.
--   **/src/features**: Contains major, user-facing areas of the application, organized into "vertical slices" (e.g., `/BookReader`, `/Library`).
--   **/src/data**: A single, consolidated directory for all non-visual logic, including the Zustand store, custom hooks, type definitions, and application-wide constants.
--   **/src/styles**: Contains the global styling architecture, including `globals.css` for resets and `fonts.css`.
+For detailed information on the codebase structure, architecture, standards, and agent protocols, please refer to **[agents.md](./agents.md)**.
 
 ## 4. Deployment to GitHub Pages
 

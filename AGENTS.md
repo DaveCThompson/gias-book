@@ -1,29 +1,65 @@
-// GIA-CODE/gia-t-books/AGENTS.md
+# Project Context
+
+**Madoodle** is a high-craft, mobile-first interactive storybook platform. The codebase (`gia-t-books`) is a Next.js application designed to be scalable, performant, and visually delightful.
+
+## Architecture
+-   **Framework**: Next.js (SSG)
+-   **State**: Zustand (Global state, minimal & performant)
+-   **Styling**: CSS Modules + Global Variables (No Tailwind, no CSS-in-JS libraries like styled-components)
+-   **UI Components**: Radix UI primitives for accessibility and behavior.
+-   **Deployment**: GitHub Pages
+
+## Key Directories
+-   `src/books/`: Self-contained book content modules.
+-   `src/features/`: Vertical slices of user-facing functionality (e.g., `BookReader`, `Library`).
+-   `src/data/`: Non-visual logic (Zustand stores, hooks, types, constants).
+-   `src/components/`: Shared, reusable UI components.
+-   `src/styles/`: Global styling manifest (`index.css`, `variables.css`, etc.).
+-   `public/`: Static assets (images, audio).
+
+## Standards
+
+### Styling (Critical)
+-   **Hybrid Strategy**: Use `src/styles/index.css` for global styles (variables, resets, fonts) and `*.module.css` for component styles.
+-   **Local by Default**: Every component MUST have a co-located `*.module.css`.
+-   **Global Variables**: Use CSS variables for colors, fonts, and spacing (defined in `variables.css`).
+-   **No Hardcoded Values**: Avoid magic numbers or hex codes in component styles.
+-   **Mobile-First**: Design for touch first, then enhance.
+
+### State Management
+-   **Zustand**: Use atoms/stores for global state.
+-   **Derived State**: Compute derived data in selectors or hooks, not in the store itself if possible.
+
+### Code Quality
+-   **Types**: Strict TypeScript usage.
+-   **Linting**: Run `npm run lint` to catch issues.
+
+## Common Commands
+-   `npm run dev`: Start development server (syncs assets first).
+-   `npm run build`: Production build (validates content & syncs assets).
+-   `npm run deploy`: Deploy to GitHub Pages.
+-   `npm run validate`: Validate book content integrity.
+
+---
 
 # Agent Charter & Execution Protocol
 
-This document defines the operating protocol for AI agents working on the **gia-t-books** codebase. Its purpose is to maximize the probability of a correct, complete, and architecturally sound "one-shot" outcome for any given task.
-
 ## Prime Directive: One-Shot Excellence
+The agent's primary goal is to deliver a complete and correct solution in a single response.
 
-The agent's primary goal is to deliver a complete and correct solution in a single response. This is achieved by adhering to three pillars:
+1.  **Holistic Analysis**: Synthesize **all** context (user request, docs, code).
+2.  **Systematic Diagnosis**: Form hypotheses, gather evidence, and identify root causes.
+3.  **Comprehensive Delivery**: Provide a complete solution package (code, docs, verification).
 
-1.  **Holistic Analysis:** Synthesize **all** provided context: the user's request, documentation, and all relevant existing code files.
-2.  **Systematic Diagnosis:** When faced with a bug, form multiple hypotheses, gather evidence from the codebase, and select a solution that definitively addresses the most likely root cause.
-3.  **Comprehensive Delivery:** A "one-shot" response is a complete solution package: all necessary file operations, code modifications, documentation updates, and a strategic verification plan.
+## Standard Execution Algorithm
+1.  **Ingestion**: Read and comprehend the request and context.
+2.  **Impact Analysis**: Identify all CRUD files.
+3.  **Virtual Refactoring**: Simulate changes mentally before writing code.
+    -   *Trace data flows.*
+    -   *Check for race conditions.*
+    -   *Verify architectural fit.*
 
-## Standard Execution Algorithm (Internal)
-
-For any non-trivial task, the agent must follow this internal thought process *before* generating the final output:
-
-1.  **Ingestion & Synthesis:** Read and fully comprehend the entire user request and all context files.
-2.  **Impact Analysis & Dependency Mapping:** Create a definitive list of all files that will be Created, Read, Updated, or Deleted (CRUD).
-3.  **Virtual Refactoring (The Mental Walkthrough):** Simulate the changes in the most critical files first.
-
-    *   **Example Simulation (Styling):** *"I need to style the `BookCover` component. I will use the co-located `BookCover.module.css` file. I will apply `className={styles.coverImage}` to the `img` tag to ensure the styles are locally scoped."*
-
-    *   **Example Simulation (Race Condition):** *"I am implementing a `useOnClickOutside` hook. The naive approach can cause a race condition. The correct architecture is to rely on `useEffect`'s post-paint execution guarantee, which ensures the event that opened the menu has already propagated."*
-
-    *   **Example Simulation (Architectural Mismatch - REAL PROJECT EXAMPLE):** *"The request is to make custom `<interactive>` tags work. A naive solution is to use `html-react-parser`. **Hypothesis:** The parser's `replace` function is not working correctly. **Diagnosis:** I trace the parser's output and discover it doesn't recognize non-standard HTML tags; it discards them. My `replace` logic is never even called. **Conclusion:** The root cause is an architectural mismatch—we are using an HTML parser for a custom markup format. **The Correct Architecture:** A dedicated React component (`InteractiveText.tsx`) that uses a regular expression to parse the specific `[tag:value]content[/tag]` format. This is deterministic, reliable, and avoids fighting the tool's intended purpose."*
-
-    *   **Example Simulation (Component Composition):** *"I need to add a Popover to a Button that already has a Tooltip. A naive wrapper causes conflicts. **Hypothesis:** Both Radix components use `asChild` and are competing for the button's events. **The Correct Architecture:** Per Radix documentation, nest the `Root` components (`<Popover.Root><Tooltip.Root>...`) and then nest their `Trigger` components. This ensures both components correctly attach their event listeners."*
+## Critical Rules
+-   **Do NOT use `replace_file_content` for large blocks** if only changing one line.
+-   **Verify paths**: Do not guess. Check `src/types.ts` vs `src/data/types.ts`.
+-   **Lint proactively**: Run linting after refactoring.

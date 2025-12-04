@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { GearIcon } from '@/components/icons/GearIcon';
 import { SettingsDialog } from './SettingsDialog';
+import { cn } from '@/utils/cn';
 import styles from './Navigation.module.css';
 
 interface NavigationProps {
@@ -41,7 +42,7 @@ const Navigation: React.FC<NavigationProps> = ({
           <button
             onClick={onPlayPause}
             disabled={!hasNarration}
-            className={styles.playButton}
+            className={cn(styles.playButton, !hasNarration && styles.disabled)}
             aria-label={isPlaying ? 'Pause narration' : 'Play narration'}
           >
             {isPlaying ? '❚❚' : '▶'}
@@ -55,14 +56,14 @@ const Navigation: React.FC<NavigationProps> = ({
           <button
             onClick={onPrev}
             disabled={currentPage === 1}
-            className={styles.navButton}
+            className={cn(styles.navButton, currentPage === 1 && styles.disabled)}
           >
             &larr; Prev
           </button>
           <button
             onClick={onNext}
             disabled={currentPage === totalPages}
-            className={styles.navButton}
+            className={cn(styles.navButton, currentPage === totalPages && styles.disabled)}
           >
             Next &rarr;
           </button>

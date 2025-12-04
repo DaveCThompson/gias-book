@@ -7,6 +7,9 @@
   /* Default background and smooth transition for mood changes */
   background: var(--gradient-calm);
   transition: background 0.8s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .bookReaderContainer[data-mood='tense'] {
@@ -14,11 +17,13 @@
 }
 
 .bookReaderContainer[data-mood='joyful'] {
-  /* You can define more gradients in globals.css */
   background: var(--gradient-calm);
 }
 
-.swiperContainer {
+.pageWrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

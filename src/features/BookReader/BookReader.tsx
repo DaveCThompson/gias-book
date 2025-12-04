@@ -2,16 +2,17 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Keyboard } from 'swiper/modules';
-import type { Swiper as SwiperInstance } from 'swiper';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useSettingsStore } from '@/data/stores/settings.store';
 import { useProgressStore } from '@/data/stores/progress.store';
-import { useAudioPlayer } from '@/data/useAudioPlayer';
-import { BookData, PageData } from '@/data/types';
+import { useBookAudio } from '@/hooks/useBookAudio';
+import { useAccessibilityNavigation } from '@/hooks/useAccessibilityNavigation';
+import { BookData } from '@/data/types';
 import Page from './Page';
 import NarrationControls from './components/NarrationControls';
 import Navigation from './components/Navigation';
+import { GestureCanvas } from './components/GestureCanvas';
+import { DesktopClickZones } from './components/DesktopClickZones';
 import styles from './BookReader.module.css';
 
 interface BookReaderProps {
@@ -19,78 +20,147 @@ interface BookReaderProps {
   currentPage: number;
 }
 
-const BookReader: React.FC<BookReaderProps> = ({ bookData, currentPage }) => {
+const BookReader: React.FC<BookReaderProps> = ({ bookData, currentPage: initialPage }) => {
   const router = useRouter();
   const { readingMode } = useSettingsStore();
   const { getLastReadPage, setLastReadPage } = useProgressStore();
-  const { play, stop, isPlaying } = useAudioPlayer();
-  const [swiperInstance, setSwiperInstance] = useState<SwiperInstance | null>(null);
-  const [activePage, setActivePage] = useState<PageData>(bookData.pages[currentPage - 1]);
-  const hasInitializedFromStorage = useRef(false);
 
+  // Optimistic State: Manage page locally for instant feedback
+  const [internalPage, setInternalPage] = useState(initialPage);
+  const [direction, setDirection] = useState(0);
+  const lastActionTime = useRef(0);
+
+  // Sync internal state if props change (e.g. browser back button or deep link)
+  // We ignore updates that happen shortly after a user action to prevent "stale" router state
+  // from reverting our optimistic update.
   useEffect(() => {
-    if (swiperInstance && !hasInitializedFromStorage.current) {
-      const lastReadPage = getLastReadPage(bookData.slug);
-      if (lastReadPage && lastReadPage !== currentPage) {
-        swiperInstance.slideTo(lastReadPage - 1, 0);
-      }
-      hasInitializedFromStorage.current = true;
+    const timeSinceLastAction = Date.now() - lastActionTime.current;
+    if (timeSinceLastAction > 2000 && initialPage !== internalPage) {
+      setInternalPage(initialPage);
     }
-  }, [swiperInstance, bookData.slug, currentPage, getLastReadPage]);
+  }, [initialPage, internalPage]);
 
-  const handleSlideChange = (swiper: SwiperInstance) => {
-    const newPageNumber = swiper.activeIndex + 1;
-    const newActivePage = bookData.pages[swiper.activeIndex];
-    setActivePage(newActivePage);
-    setLastReadPage(bookData.slug, newPageNumber);
-    const url = `/${bookData.slug}/${newPageNumber}`;
-    router.replace(url, undefined, { shallow: true });
-  };
+  const activePage = bookData.pages[internalPage - 1];
+  const totalPages = bookData.pages.length;
 
-  useEffect(() => {
-    if (readingMode === 'narrated' && activePage?.narrationUrl) {
-      play(activePage.narrationUrl);
-    } else {
-      stop();
+  // Audio Hook
+  useBookAudio({
+    narrationUrl: activePage?.narrationUrl,
+    isPlaying: readingMode === 'narrated',
+    onEnd: () => {
+      // Auto-advance logic could go here if desired
+    },
+  });
+
+  // Navigation Handlers
+  const handlePrev = useCallback(() => {
+    if (internalPage > 1) {
+      lastActionTime.current = Date.now();
+      setDirection(-1);
+      const newPage = internalPage - 1;
+
+      // Optimistic Update
+      setInternalPage(newPage);
+      setLastReadPage(bookData.slug, newPage);
+
+      // Router update (shallow)
+      router.replace(`/${bookData.slug}/${newPage}`, undefined, { shallow: true });
     }
-  }, [readingMode, activePage, play, stop]);
+  }, [internalPage, bookData.slug, router, setLastReadPage]);
 
-  const handlePrev = useCallback(() => swiperInstance?.slidePrev(), [swiperInstance]);
-  const handleNext = useCallback(() => swiperInstance?.slideNext(), [swiperInstance]);
+  const handleNext = useCallback(() => {
+    if (internalPage < totalPages) {
+      lastActionTime.current = Date.now();
+      setDirection(1);
+      const newPage = internalPage + 1;
 
+      // Optimistic Update
+      setInternalPage(newPage);
+      setLastReadPage(bookData.slug, newPage);
+
+      // Router update (shallow)
+      router.replace(`/${bookData.slug}/${newPage}`, undefined, { shallow: true });
+    }
+  }, [internalPage, totalPages, bookData.slug, router, setLastReadPage]);
+
+  // A11y Hook (Keyboard + Screen Reader)
+  const { a11yStatus, containerRef } = useAccessibilityNavigation({
+    currentPage: internalPage,
+    totalPages,
+    onPrev: handlePrev,
+    onNext: handleNext,
+  });
+
+  // Play/Pause Toggle
   const handlePlayPause = useCallback(() => {
-    if (isPlaying) {
-      stop();
-    } else if (activePage?.narrationUrl) {
-      play(activePage.narrationUrl);
+    if (readingMode === 'narrated') {
+      useSettingsStore.getState().toggleReadingMode(); // Switch to self-read (stops audio)
+    } else {
+      useSettingsStore.getState().toggleReadingMode(); // Switch to narrated (starts audio)
     }
-  }, [isPlaying, activePage, play, stop]);
+  }, [readingMode]);
+
+  // Restore last read page on mount
+  const hasInitialized = useRef(false);
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      const lastRead = getLastReadPage(bookData.slug);
+      if (lastRead && lastRead !== initialPage) {
+        // Update internal state immediately
+        setInternalPage(lastRead);
+        router.replace(`/${bookData.slug}/${lastRead}`, undefined, { shallow: true });
+      }
+      hasInitialized.current = true;
+    }
+  }, [bookData.slug, initialPage, getLastReadPage, router]);
 
   return (
-    <div className={styles.bookReaderContainer} data-mood={activePage.mood || 'calm'}>
+    <div
+      className={styles.bookReaderContainer}
+      data-mood={activePage.mood || 'calm'}
+      ref={containerRef}
+      tabIndex={-1} // Allow focus for keyboard events
+    >
+      {a11yStatus}
+
       <Navigation
-        currentPage={activePage.pageNumber}
-        totalPages={bookData.pages.length}
+        currentPage={internalPage}
+        totalPages={totalPages}
         onPrev={handlePrev}
         onNext={handleNext}
         onPlayPause={handlePlayPause}
-        isPlaying={isPlaying}
+        isPlaying={readingMode === 'narrated'}
         hasNarration={!!activePage.narrationUrl}
       />
-      <Swiper
-        modules={[Keyboard]}
-        keyboard={{ enabled: true }}
-        onSwiper={setSwiperInstance}
-        initialSlide={currentPage - 1}
-        onSlideChange={handleSlideChange}
-        className={styles.swiperContainer}
+
+      <DesktopClickZones
+        onPrev={handlePrev}
+        onNext={handleNext}
+        canPrev={internalPage > 1}
+        canNext={internalPage < totalPages}
+      />
+
+      <GestureCanvas
+        onPrev={handlePrev}
+        onNext={handleNext}
+        isFirstPage={internalPage === 1}
+        isLastPage={internalPage === totalPages}
       >
-        {bookData.pages.map((page) => (
-          <SwiperSlide key={page.pageNumber}>
-            {({ isActive }) => <Page pageData={page} isActive={isActive} />}
-          </SwiperSlide>
-        ))}
-      </Swiper>
+        <AnimatePresence initial={false} custom={direction} mode="wait">
+          <motion.div
+            key={internalPage}
+            custom={direction}
+            initial={{ x: direction > 0 ? 300 : -300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: direction > 0 ? -300 : 300, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className={styles.pageWrapper}
+          >
+            <Page pageData={activePage} isActive={true} />
+          </motion.div>
+        </AnimatePresence>
+      </GestureCanvas>
+
       <NarrationControls />
     </div>
   );

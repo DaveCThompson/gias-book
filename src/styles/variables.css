@@ -1,7 +1,4 @@
-/* src/styles/globals.css */
-
-/* Import our new font definitions first */
-@import url('./fonts.css');
+/* src/styles/variables.css */
 
 /* 
   This is the foundation of our theming system.
@@ -41,18 +38,4 @@
     --color-button-text: #eeeeee;
     --color-button-background-hover: #333333;
   }
-}
-
-/* Basic CSS Reset and Body Styles */
-body {
-  padding: 0;
-  margin: 0;
-  font-family: var(--font-body); /* Use the new body font */
-  background-color: var(--color-background);
-  color: var(--color-text);
-  transition: background-color 0.2s, color 0.2s;
-}
-
-* {
-  box-sizing: border-box;
 }

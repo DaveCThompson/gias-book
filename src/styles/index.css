@@ -1,0 +1,19 @@
+/* src/styles/index.css */
+
+/* 
+  The Manifest
+  This file serves as the entry point for all global styles.
+  It imports modules in a specific order to ensure correct cascading.
+*/
+
+/* 1. Fonts */
+@import url('./fonts.css');
+
+/* 2. Variables (Theming) */
+@import url('./variables.css');
+
+/* 3. Resets */
+@import url('./reset.css');
+
+/* 4. Base Typography & Global Styles */
+@import url('./typography.css');
