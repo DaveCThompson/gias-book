@@ -20,7 +20,7 @@
 }
 
 .zone:hover:not(:disabled) {
-    background: rgba(0, 0, 0, 0.03);
+    background: oklch(0% 0 0 / 0.03);
     /* Very subtle hover tint */
 }
 
@@ -41,14 +41,14 @@
     opacity: 0;
     transform: translateX(0);
     transition: opacity 0.3s ease, transform 0.3s ease;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--color-button-background);
     border-radius: 50%;
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card);
 }
 
 .zone:hover:not(:disabled) .indicator {
@@ -65,7 +65,7 @@
 
 .arrow {
     font-size: 24px;
-    color: #333;
+    color: var(--color-button-text);
     font-weight: bold;
 }
 

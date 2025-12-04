@@ -6,7 +6,7 @@ import { z } from 'zod';
 const pageDataSchema = z.object({
   pageNumber: z.number().int().positive(),
   text: z.string().min(1),
-  illustration: z.string().url().optional(),
+  illustration: z.string().optional(),
   mask: z.string().optional(),
   narrationUrl: z.string().optional(),
   mood: z.enum(['calm', 'tense', 'joyful']).optional(), // Added mood validation

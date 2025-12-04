@@ -23,12 +23,20 @@
 -   **Hybrid Strategy**: Use `src/styles/index.css` for global styles (variables, resets, fonts) and `*.module.css` for component styles.
 -   **Local by Default**: Every component MUST have a co-located `*.module.css`.
 -   **Global Variables**: Use CSS variables for colors, fonts, and spacing (defined in `variables.css`).
--   **No Hardcoded Values**: Avoid magic numbers or hex codes in component styles.
+    -   **Color System**: Use `oklch` for all color definitions to ensure perceptual uniformity and vibrant gamuts.
+    -   **Theming**: Support Light, Dark, and System modes via `[data-theme='dark']` attributes.
+-   **No Hardcoded Values**: Avoid magic numbers or hex codes in component styles. Use semantic variables (e.g., `--color-text-subtle`, `--shadow-card`).
+-   **Utilities**: Use the `cn` utility (wrapping `clsx`) for conditional class names. Do NOT use manual string concatenation.
 -   **Mobile-First**: Design for touch first, then enhance.
 
 ### State Management
 -   **Zustand**: Use atoms/stores for global state.
 -   **Derived State**: Compute derived data in selectors or hooks, not in the store itself if possible.
+
+### Content & Assets
+-   **Validation**: All book content MUST pass validation. Run `npm run validate` to check `data.json` integrity.
+-   **Asset Sync**: Assets are synced from `src/books/*/assets` to `public/books/*/assets`. Run `npm run sync:assets` to update.
+-   **Formats**: Use modern formats (WebP for images, M4A/MP3 for audio) where possible.
 
 ### Code Quality
 -   **Types**: Strict TypeScript usage.
@@ -44,8 +52,8 @@
 
 # Agent Charter & Execution Protocol
 
-## Prime Directive: One-Shot Excellence
-The agent's primary goal is to deliver a complete and correct solution in a single response.
+## Prime Directive: High-Fidelity Excellence
+The agent's primary goal is to deliver a complete, correct, and **visually polished** solution in a single response. We are building a premium product, not a prototype.
 
 1.  **Holistic Analysis**: Synthesize **all** context (user request, docs, code).
 2.  **Systematic Diagnosis**: Form hypotheses, gather evidence, and identify root causes.
@@ -58,8 +66,10 @@ The agent's primary goal is to deliver a complete and correct solution in a sing
     -   *Trace data flows.*
     -   *Check for race conditions.*
     -   *Verify architectural fit.*
+    -   *Check for visual regressions.*
 
 ## Critical Rules
 -   **Do NOT use `replace_file_content` for large blocks** if only changing one line.
 -   **Verify paths**: Do not guess. Check `src/types.ts` vs `src/data/types.ts`.
 -   **Lint proactively**: Run linting after refactoring.
+-   **Respect the Design**: Maintain the high-craft aesthetic. Do not introduce generic styles.
