@@ -1,9 +1,9 @@
 // src/features/Library/BookCover.tsx
 
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { BookData } from '@/data/types';
+import { useViewTransitionRouter } from '@/hooks/useViewTransition';
 import styles from './BookCover.module.css';
 
 interface BookCoverProps {
@@ -11,11 +11,17 @@ interface BookCoverProps {
 }
 
 const BookCover: React.FC<BookCoverProps> = ({ book }) => {
+  const { navigateWithTransition } = useViewTransitionRouter();
+
   // Find the first page with an illustration to use as a cover image
   const coverImage = book.pages.find((page) => page.illustration)?.illustration;
 
+  const handleClick = () => {
+    navigateWithTransition(`/book/${book.slug}`);
+  };
+
   return (
-    <Link href={`/${book.slug}/1`} className={styles.coverLink}>
+    <button onClick={handleClick} className={styles.coverLink}>
       <div className={styles.coverContainer}>
         {coverImage ? (
           <Image
@@ -23,6 +29,7 @@ const BookCover: React.FC<BookCoverProps> = ({ book }) => {
             alt={`Cover for ${book.title}`}
             fill
             className={styles.coverImage}
+            style={{ viewTransitionName: `book-cover-${book.slug}` }}
           />
         ) : (
           <div className={styles.placeholderImage} />
@@ -33,7 +40,7 @@ const BookCover: React.FC<BookCoverProps> = ({ book }) => {
           <p className={styles.author}>by {book.author}</p>
         </div>
       </div>
-    </Link>
+    </button>
   );
 };
 

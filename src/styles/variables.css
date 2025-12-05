@@ -58,6 +58,17 @@
   --color-overlay-gradient-start: oklch(0% 0 0 / 0.7);
   --color-overlay-gradient-end: oklch(0% 0 0 / 0);
   --color-overlay-text: var(--color-neutral-000);
+
+  /* View Transitions */
+  --duration-morph: 400ms;
+  --duration-fade: 200ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Z-Index Layers */
+  --z-library: 1;
+  --z-lobby-backdrop: 100;
+  --z-lobby-modal: 110;
+  --z-lobby-menu: 120;
 }
 
 /* Dark Theme Override */

@@ -1,6 +1,7 @@
 /* src/features/Library/BookCover.module.css */
 
 .coverLink {
+  all: unset;
   display: block;
   text-decoration: none;
   color: inherit;
@@ -8,6 +9,7 @@
   overflow: hidden;
   box-shadow: var(--shadow-card);
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
 }
 
 .coverLink:hover {
